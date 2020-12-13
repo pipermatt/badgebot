@@ -1,1 +1,0 @@
-To add this bot to your Discord: https://discord.com/oauth2/authorize?client_id=787512971164647474&scope=bot

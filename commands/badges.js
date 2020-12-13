@@ -21,10 +21,17 @@ const Fields = {
     LegendaryBadges: 8
 }
 
+const badgeColors = new Map();
+badgeColors.set(Fields.CommonBadges, 'GREY');
+badgeColors.set(Fields.UncommonBadges, 'GREEN');
+badgeColors.set(Fields.RareBadges, 'RARE');
+badgeColors.set(Fields.EpicBadges, 'PURPLE');
+badgeColors.set(Fields.LegendaryBadges, 'GOLD');
+
 function HandleCommand(message, args) {
     if (!args.length) {
-        message.reply("I didn't quite get that... try `!badges help`");
-    } else if (args[0] === 'help')
+        return message.reply("I didn't quite get that... try `!badges help`");
+    } else if (args[0] === 'help') {
         return message.channel.send('> GoT:WiC Badges Bot - Calculates optimal badge count\n> \n> **Usage**: `!badges #`');
     }
 
@@ -43,7 +50,7 @@ function HandleCommand(message, args) {
 
 function SendMessage(message, badges) {
     const embed = new MessageEmbed()
-        .setAuthor('GoT:WiC Badges Bot', "https://raw.githubusercontent.com/pipermatt/badgebot/main/Badge.png", "https://github.com/pipermatt/badgebot")
+        .setAuthor('GoT:WiC Badges Bot', "https://raw.githubusercontent.com/pipermatt/badgebot/main/assets/Badge.png", "https://github.com/pipermatt/badgebot")
         .setTitle(`Optimal Badge Configuration Report for ${message.member ? message.member.displayName : message.author.username }`)  
         .setDescription(GenerateDescription(badges))
         .setColor(GetHighestBadgeColor(badges))
@@ -59,32 +66,29 @@ function SendMessage(message, badges) {
 function GenerateDescription(badges) {
     var description = "";
 
-    if (badges[Fields.CommonBadges] > 0) description += `**Common**: ${data[Fields.CommonBadges]}\n`;
-    if (data[Fields.UncommonBadges] > 0) description += `**Uncommon**: ${data[Fields.UncommonBadges]}\n`;
-    if (data[Fields.RareBadges] > 0) description += `**Rare**: ${data[Fields.RareBadges]}\n`;
-    if (data[Fields.EpicBadges] > 0) description += `**Epic**: ${data[Fields.EpicBadges]}\n`;
-    if (data[Fields.LegendaryBadges] > 0) description += `**Legendary**: ${data[Fields.LegendaryBadges]}\n`;
+    if (badges[Fields.CommonBadges] > 0) description += `**Common**: ${badges[Fields.CommonBadges]}\n`;
+    if (badges[Fields.UncommonBadges] > 0) description += `**Uncommon**: ${badges[Fields.UncommonBadges]}\n`;
+    if (badges[Fields.RareBadges] > 0) description += `**Rare**: ${badges[Fields.RareBadges]}\n`;
+    if (badges[Fields.EpicBadges] > 0) description += `**Epic**: ${badges[Fields.EpicBadges]}\n`;
+    if (badges[Fields.LegendaryBadges] > 0) description += `**Legendary**: ${badges[Fields.LegendaryBadges]}\n`;
     
     return description;
 }
 
 function GetHighestBadgeColor(badges) {
-    const badgeColors = [ 'GREY', 'GREEN', 'BLUE', 'PURPLE', 'GOLD' ];
-
-    for (var i = Fields.LegendaryBadges; i > Fields.CommonBadges; i++) {
-        if (badges[i] > 0) return badgeColors[i];
+    for (var i = Fields.LegendaryBadges; i > Fields.CommonBadges; i--) {
+        if (badges[i] > 0) return badgeColors.get(i);
     }
 }
 
 function GenerateFooter(badges) {
-    var footer = '';
     var next = DetermineNextUpgrade(badges[Fields.TotalCommonBadges]);
     var more = next[Fields.TotalCommonBadges] - badges[Fields.TotalCommonBadges];
 
     if (more > 0) {
-      footer = `Next upgrade: ${more} more badge${more > 1 ? 's' : ''} will boost your bonus to ${next[Fields.TotalBonus]}\n`;      
+      return `Next upgrade: ${more} more badge${more > 1 ? 's' : ''} will boost your bonus to ${next[Fields.TotalBonus]}\n`;      
     } else {
-      footer = 'Reached max bonus';
+      return 'Reached max bonus';
     }
 }
 

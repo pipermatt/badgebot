@@ -40,13 +40,18 @@ function HandleCommand(message, args) {
 }
 
 function SendMessage(message, data) {
-    const embed = new MessageEmbed()
-        .setColor('#0099ff')
-        .setTitle(`Optimal Badge Configuration Report for ${message.member.displayName}`)
-        .addFields(
+    const embed = new MessageEmbed();
+    embed.setColor('#0099ff')
+    embed.addFields(
             { name: 'Total', value: data[Fields.TotalCommonBadges], inline: true },
             { name: 'Used ', value: data[Fields.UsedCommonBadges], inline: true },
             { name: 'Bonus', value: data[Fields.TotalBonus], inline: true });
+
+    var title = 'Optimal Badge Configuration Report';
+    if (message.member.displayName) {
+        title += `for ${message.member.displayName}`;
+    }
+    embed.setTitle(title);
 
     var description = '';
     if (data[Fields.CommonBadges] > 0) description += `**Common**: ${data[Fields.CommonBadges]}\n`;

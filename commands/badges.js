@@ -58,22 +58,24 @@ function SendMessage(message, data) {
             
     var next = DetermineNextUpgrade(data[Fields.TotalCommonBadges]);
     var more = next - data[Fields.TotalCommonBadges];
-    var footer = `Next upgrade: ${more} more badge${more > 1 ? 's' : ''} will boost your bonus to ${badges[next][Fields.TotalBonus]}\n`;
-
-    embed.setFooter(footer)
+    if (more > 0) {
+      embed.setFooter(`Next upgrade: ${more} more badge${more > 1 ? 's' : ''} will boost your bonus to ${badges[next][Fields.TotalBonus]}\n`);      
+    } else {
+      embed.setFooter('Reached max bonus');
+    }
 
     message.channel.send(embed);
 }
 
 function DetermineNextUpgrade(current) {
     var currentBonus = badges[current][Fields.TotalBonus];
-    var next = parseInt(current) + 1;
+    var next = parseInt(current);
 
-    while (next < badges.length - 1) {
+    while (next + 1 < badges.length - 1) {
+        next++;
         if (badges[next][Fields.TotalBonus] > currentBonus) {
             return next;
         }
-        next++;
     }
 
     return next;

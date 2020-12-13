@@ -9,7 +9,7 @@ csv.parseFile(filename)
 	.on("data", data => badges.push(data))
 	.on("end", rowCount => console.log(`${rowCount - 1} rows read from ${filename}...`));
 
-var Fields = {
+const Fields = {
     TotalCommonBadges: 0,
     UsedCommonBadges: 1,
     UnusedCommonBadges: 2,
@@ -39,32 +39,51 @@ function HandleCommand(message, args) {
     }
 }
 
-function SendMessage(message, data) {
+function SendMessage(message, badges) {
     const embed = new MessageEmbed()
-      .setColor('#0099ff')
-      .setTitle(`Optimal Badge Configuration Report for ${message.member ? message.member.displayName : message.author.username }`)  
-      .addFields(
-            { name: 'Total', value: data[Fields.TotalCommonBadges], inline: true },
-            { name: 'Used ', value: data[Fields.UsedCommonBadges], inline: true },
-            { name: 'Bonus', value: data[Fields.TotalBonus], inline: true });
+        .setAuthor('GoT:WiC Badges Bot', "https://raw.githubusercontent.com/pipermatt/badgebot/main/Badge.png", "https://github.com/pipermatt/badgebot")
+        .setTitle(`Optimal Badge Configuration Report for ${message.member ? message.member.displayName : message.author.username }`)  
+        .setDescription(GenerateDescription(badges))
+        .setColor(GetHighestBadgeColor(badges))
+        .addFields(
+            { name: 'Total', value: badges[Fields.TotalCommonBadges], inline: true },
+            { name: 'Used ', value: badges[Fields.UsedCommonBadges], inline: true },
+            { name: 'Bonus', value: badges[Fields.TotalBonus], inline: true })
+        .setFooter(GenerateFooter(badges))
 
-    var description = '';
-    if (data[Fields.CommonBadges] > 0) description += `**Common**: ${data[Fields.CommonBadges]}\n`;
+    message.channel.send(embed);
+}
+
+function GenerateDescription(badges) {
+    var description = "";
+
+    if (badges[Fields.CommonBadges] > 0) description += `**Common**: ${data[Fields.CommonBadges]}\n`;
     if (data[Fields.UncommonBadges] > 0) description += `**Uncommon**: ${data[Fields.UncommonBadges]}\n`;
     if (data[Fields.RareBadges] > 0) description += `**Rare**: ${data[Fields.RareBadges]}\n`;
     if (data[Fields.EpicBadges] > 0) description += `**Epic**: ${data[Fields.EpicBadges]}\n`;
     if (data[Fields.LegendaryBadges] > 0) description += `**Legendary**: ${data[Fields.LegendaryBadges]}\n`;
-    embed.setDescription(description);
-            
-    var next = DetermineNextUpgrade(data[Fields.TotalCommonBadges]);
-    var more = next - data[Fields.TotalCommonBadges];
-    if (more > 0) {
-      embed.setFooter(`Next upgrade: ${more} more badge${more > 1 ? 's' : ''} will boost your bonus to ${badges[next][Fields.TotalBonus]}\n`);      
-    } else {
-      embed.setFooter('Reached max bonus');
-    }
+    
+    return description;
+}
 
-    message.channel.send(embed);
+function GetHighestBadgeColor(badges) {
+    const badgeColors = [ 'GREY', 'GREEN', 'BLUE', 'PURPLE', 'GOLD' ];
+
+    for (var i = Fields.LegendaryBadges; i > Fields.CommonBadges; i++) {
+        if (badges[i] > 0) return badgeColors[i];
+    }
+}
+
+function GenerateFooter(badges) {
+    var footer = '';
+    var next = DetermineNextUpgrade(badges[Fields.TotalCommonBadges]);
+    var more = next[Fields.TotalCommonBadges] - badges[Fields.TotalCommonBadges];
+
+    if (more > 0) {
+      footer = `Next upgrade: ${more} more badge${more > 1 ? 's' : ''} will boost your bonus to ${next[Fields.TotalBonus]}\n`;      
+    } else {
+      footer = 'Reached max bonus';
+    }
 }
 
 function DetermineNextUpgrade(current) {
@@ -74,11 +93,11 @@ function DetermineNextUpgrade(current) {
     while (next + 1 < badges.length - 1) {
         next++;
         if (badges[next][Fields.TotalBonus] > currentBonus) {
-            return next;
+            return badges[next];
         }
     }
 
-    return next;
+    return badges[next];
 }
 
 module.exports = {

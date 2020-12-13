@@ -23,7 +23,9 @@ const Fields = {
 
 function HandleCommand(message, args) {
     if (!args.length) {
-        return message.channel.send('> GoT:WiC Badges Bot - Calculates optimal badge count\n> \n> **Usage**: `!badges 10`');
+        message.reply("I didn't quite get that... try `!badges help`");
+    } else if (args[0] === 'help')
+        return message.channel.send('> GoT:WiC Badges Bot - Calculates optimal badge count\n> \n> **Usage**: `!badges #`');
     }
 
     const badgeCount = parseInt(args[0]);

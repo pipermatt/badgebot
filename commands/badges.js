@@ -49,7 +49,7 @@ function SendMessage(message, data) {
 
     var title = 'Optimal Badge Configuration Report';
     if (message.member.displayName) {
-        title += `for ${message.member.displayName}`;
+        title += ` for ${message.member.displayName}`;
     }
     embed.setTitle(title);
 

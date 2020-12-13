@@ -1,0 +1,15 @@
+{
+  "name": "gotwic-badges-bot",
+  "version": "1.0.0",
+  "description": "README",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fast-csv/parse": "^4.3.6",
+    "discord.js": "^12.5.1"
+  }
+}
